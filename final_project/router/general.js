@@ -41,9 +41,9 @@ public_users.get('/isbn/:isbn', function (req, res) {
     }
 });
 
-// Get book details based on author (case-insensitive)
+// Get book details based on author
 public_users.get('/author/:author', function (req, res) {
-    const author = req.params.author.toLowerCase();  
+    const author = req.params.author.toLowerCase();
     const booksByAuthor = [];
 
     // Iterate through all books
@@ -60,9 +60,9 @@ public_users.get('/author/:author', function (req, res) {
     }
 });
 
-// Get all books based on title (case-insensitive)
+// Get all books based on title
 public_users.get('/title/:title', function (req, res) {
-    const title = req.params.title.toLowerCase();  
+    const title = req.params.title.toLowerCase();
     const booksByTitle = [];
 
     // Iterate through all books
@@ -91,4 +91,45 @@ public_users.get('/review/:isbn', function (req, res) {
     }
 });
 
+const axios = require('axios');
+// Function to get the list of books using Promises
+function getBooksPromise() {
+    axios.get('https://arongeorgeja-5000.theianext-1-labs-prod-misc-tools-us-east-0.proxy.cognitiveclass.ai/')
+        .then(response => {
+            console.log("Books (Promise):", response.data);
+        })
+        .catch(error => {
+            console.error("Error fetching books (Promise):", error.message);
+        });
+}
+getBooksPromise();
+
+const BASE_URL = 'https://arongeorgeja-5000.theianext-1-labs-prod-misc-tools-us-east-0.proxy.cognitiveclass.ai/'; // or your lab-provided proxy URL
+// Function to get book details by ISBN using Promises
+function getBookByISBNPromise(isbn) {
+    axios.get(`${BASE_URL}/isbn/${isbn}`)
+        .then(response => {
+            console.log(`Book details for ISBN ${isbn} (Promise):`, response.data);
+        })
+        .catch(error => {
+            console.error(`Error fetching book details for ISBN ${isbn} (Promise):`, error.message);
+        });
+}
+
+getBookByISBNPromise('1');
+
+function getBookByTitlePromise(title) {
+    axios.get(`${BASE_URL}/title/${title}`)
+        .then(response => {
+            console.log(`Book details for title ${title} (Promise):`, response.data);
+        })
+        .catch(error => {
+            console.error(`Error fetching book details for title ${title} (Promise):`, error.message);
+        });
+}
+getBookByTitlePromise('Fairy tales');
+
+module.exports.getBooksPromise = getBooksPromise;
+module.exports.getBookByISBNPromise = getBookByISBNPromise;
+module.exports.getBookByTitlePromise = getBookByTitlePromise;
 module.exports.general = public_users;

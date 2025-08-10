@@ -4,76 +4,90 @@ let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
 
+// Register a new user
+public_users.post('/register', (req, res) => {
+    const { username, password } = req.body;
 
-public_users.post("/register", (req, res) => {
-    //Write your code here
-    return res.status(300).json({ message: "Yet to be implemented" });
+    // Check if username and password are provided
+    if (!username || !password) {
+        return res.status(400).json({ message: "Username and password are required" });
+    }
+
+    // Check if username already exists
+    const userExists = users.some(user => user.username === username);
+    if (userExists) {
+        return res.status(409).json({ message: "Username already exists" });
+    }
+
+    // Add new user
+    users.push({ username, password });
+    return res.status(201).json({ message: "User registered successfully" });
 });
 
-// Get the book list available in the shop
+// Get the book list available in the shop (pretty printed)
 public_users.get('/', function (req, res) {
-    res.send(books);
+    res.send(JSON.stringify(books, null, 4));
 });
 
-// Get book details based on ISBN
+// Get book details based on ISBN (pretty printed)
 public_users.get('/isbn/:isbn', function (req, res) {
     const isbn = req.params.isbn;  // Get ISBN from URL params
     const book = books[isbn];      // Access the book details from the books object
 
     if (book) {
-        res.json(book);            // Send book details as JSON if found
+        res.send(JSON.stringify(book, null, 4));
     } else {
-        res.status(404).json({message: "Book not found"});  // Send 404 if not found
+        res.status(404).json({ message: "Book not found" });
     }
 });
 
-// Get book details based on author
+// Get book details based on author (case-insensitive)
 public_users.get('/author/:author', function (req, res) {
-    const author = req.params.author;  // Get author from URL params
+    const author = req.params.author.toLowerCase();  
     const booksByAuthor = [];
 
     // Iterate through all books
     Object.keys(books).forEach((isbn) => {
-        if (books[isbn].author === author) {
+        if (books[isbn].author.toLowerCase() === author) {
             booksByAuthor.push(books[isbn]);
         }
     });
 
     if (booksByAuthor.length > 0) {
-        res.json(booksByAuthor);  // Send list of books by the author
+        res.send(JSON.stringify(booksByAuthor, null, 4));
     } else {
-        res.status(404).json({message: "No books found for the author"});
+        res.status(404).json({ message: "No books found for the author" });
     }
 });
 
-// Get all books based on title
+// Get all books based on title (case-insensitive)
 public_users.get('/title/:title', function (req, res) {
-    const title = req.params.title;  // Get title from URL params
+    const title = req.params.title.toLowerCase();  
     const booksByTitle = [];
 
     // Iterate through all books
     Object.keys(books).forEach((isbn) => {
-        if (books[isbn].title === title) {
+        if (books[isbn].title.toLowerCase() === title) {
             booksByTitle.push(books[isbn]);
         }
     });
 
     if (booksByTitle.length > 0) {
-        res.json(booksByTitle);  // Send list of books matching the title
+        res.send(JSON.stringify(booksByTitle, null, 4));
     } else {
-        res.status(404).json({message: "No books found with the given title"});
+        res.status(404).json({ message: "No books found with the given title" });
     }
 });
 
-//  Get book review
+// Get book review
 public_users.get('/review/:isbn', function (req, res) {
     const isbn = req.params.isbn;  // Get ISBN from URL params
     const book = books[isbn];      // Access book details by ISBN
 
-    if (book && book.reviews) {
-        res.json(book.reviews);    // Send the reviews as JSON
+    if (book) {
+        res.send(JSON.stringify(book.reviews, null, 4));
     } else {
-        res.status(404).json({message: "Reviews not found for this ISBN"});
+        res.status(404).json({ message: "Book not found" });
     }
 });
 

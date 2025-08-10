@@ -118,6 +118,17 @@ function getBookByISBNPromise(isbn) {
 
 getBookByISBNPromise('1');
 
+function getBookByAuthorPromise(author) {
+    axios.get(`${BASE_URL}/author/${author}`)
+        .then(response => {
+            console.log(`Book details for author ${author} (Promise):`, response.data);
+        })
+        .catch(error => {
+            console.error(`Error fetching book details for author ${author} (Promise):`, error.message);
+        });
+}
+getBookByAuthorPromise('Jane Austen');
+
 function getBookByTitlePromise(title) {
     axios.get(`${BASE_URL}/title/${title}`)
         .then(response => {
@@ -131,5 +142,6 @@ getBookByTitlePromise('Fairy tales');
 
 module.exports.getBooksPromise = getBooksPromise;
 module.exports.getBookByISBNPromise = getBookByISBNPromise;
+module.exports.getBookByAuthorPromise = getBookByAuthorPromise;
 module.exports.getBookByTitlePromise = getBookByTitlePromise;
 module.exports.general = public_users;

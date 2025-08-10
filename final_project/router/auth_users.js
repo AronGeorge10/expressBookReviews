@@ -42,7 +42,11 @@ regd_users.post("/login", (req, res) => {
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
 
     // Save token in session or send it in response
-    req.session.authorization = { token };
+    // req.session.authorization = { token };
+    req.session.authorization = {
+        username: user.username,
+        accessToken: token  // match what middleware checks
+    };
 
     return res.status(200).json({ message: "User logged in successfully", token });
 });
@@ -71,6 +75,24 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
     book.reviews[username] = review;
 
     return res.status(200).json({ message: "Review added/modified successfully", reviews: book.reviews });
+});
+
+// Delete a book review
+regd_users.delete("/auth/review/:isbn", (req, res) => {
+    const isbn = req.params.isbn;
+    const username = req.session.authorization.username;
+
+    const book = books[isbn];
+    if (!book) {
+        return res.status(404).json({ message: "Book not found" });
+    }
+
+    if (book.reviews && book.reviews[username]) {
+        delete book.reviews[username];
+        return res.status(200).json({ message: "Review deleted successfully", reviews: book.reviews });
+    } else {
+        return res.status(404).json({ message: "Review by user not found" });
+    }
 });
 
 module.exports.authenticated = regd_users;
